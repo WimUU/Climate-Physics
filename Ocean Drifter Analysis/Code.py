@@ -13,6 +13,8 @@ import drifter_analysis as da
 
 #%%
 
+#Even testen of GitHub lekker werkt.
+
 data = genfromtxt('01_prepped.csv', delimiter=',')
 era = ncdf.Dataset("/Users/Wim/Desktop/MAIO/MAIO Drifter project/era_data.nc", mode = 'r')
 
