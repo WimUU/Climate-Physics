@@ -41,6 +41,7 @@ class drifter_analysis(object):
         # calculate coordinates and velocity data using function analysis()
         self.coordinates = None
         self.velocity = None
+        self.speed = None
         self.analysis()    
         
         # ERA-interim data to be used in angle calculation
@@ -59,6 +60,7 @@ class drifter_analysis(object):
         """
         
         velocities = np.zeros((len(self.data)//self.interval-1,2))
+        speed = np.zeros(len(self.data)//self.interval-1)
         coordinates = np.zeros((len(self.data)//self.interval,2))
         
         for k in range(1,len(self.data)//self.interval):
@@ -72,6 +74,7 @@ class drifter_analysis(object):
             # vincenty is a method to determine distance between points on earth
             u = vincenty((x0,y0),(x1,y0)).meters/(self.interval*60*60)
             v = vincenty((x0,y0),(x0,y1)).meters/(self.interval*60*60)
+
             
             if x1 < x0:
                 u = -u   # Because vincenty always returns a positive number
@@ -81,6 +84,7 @@ class drifter_analysis(object):
         
             velocities[k-1] = [u,v]
             coordinates[k-1] = [x0,y0]
+            speed[k-1] = np.sqrt(u**2+v**2)
             
             # return last GPS points because velocity is 1 entry shorter
             # due to requiring two points to calculate velocity.
@@ -89,6 +93,7 @@ class drifter_analysis(object):
 
         self.velocity = velocities
         self.coordinates = coordinates
+        self.speed = speed
         
     def era_buoy_angle(self):
         """

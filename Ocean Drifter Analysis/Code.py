@@ -13,10 +13,9 @@ import drifter_analysis as da
 
 #%%
 
-#Even testen of GitHub lekker werkt.
 
 data = genfromtxt('01_prepped.csv', delimiter=',')
-era = ncdf.Dataset("/Users/Wim/Desktop/MAIO/MAIO Drifter project/era_data.nc", mode = 'r')
+era = ncdf.Dataset("era_data.nc", mode = 'r')
 
 time_interval = 48
 a = da.drifter_analysis(data_set=data,time_interval=time_interval,era_data = era, angle_calc=True)
@@ -31,3 +30,14 @@ plt.title(r'Angle between wind and buoy velocity. Positive $\theta$ is to the ri
 plt.xlabel(r'Day (starting from 2013-12-12)',fontsize=17.5)
 plt.ylabel(r'$\theta$',fontsize=25)
 plt.grid()
+plt.show()
+
+
+ax = plt.subplot(111, polar = True)
+c = plt.scatter(a.angles, a.speed)
+ax.set_theta_zero_location('N')
+ax.set_theta_direction(-1)
+ax.grid(True)
+ax.set_rlabel_position(300)
+ax.tick_params(labelsize = 13)
+plt.show()
