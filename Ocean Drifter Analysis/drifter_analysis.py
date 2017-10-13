@@ -42,6 +42,7 @@ class drifter_analysis(object):
         self.coordinates = None
         self.velocity = None
         self.speed = None
+        self.buoyangle = None
         self.analysis()    
         
         # ERA-interim data to be used in angle calculation
@@ -62,6 +63,7 @@ class drifter_analysis(object):
         velocities = np.zeros((len(self.data)//self.interval-1,2))
         speed = np.zeros(len(self.data)//self.interval-1)
         coordinates = np.zeros((len(self.data)//self.interval,2))
+        buoyangles = np.zeros((len(self.data)//self.interval-1))
         
         for k in range(1,len(self.data)//self.interval):
             # u-velocity from difference in latitude/dt            
@@ -85,12 +87,17 @@ class drifter_analysis(object):
             velocities[k-1] = [u,v]
             coordinates[k-1] = [x0,y0]
             speed[k-1] = np.sqrt(u**2+v**2)
+            buoyangles[k-1] = (np.pi/2-np.angle(u+1j*v,deg=False))%(2*np.pi)
             
             # return last GPS points because velocity is 1 entry shorter
             # due to requiring two points to calculate velocity.
             if k == len(self.data)//self.interval-1:
                 coordinates[k] = [x1,y1] 
-
+        # Calculates the angle of the velocities
+#        buoyangles = np.angle(velocities[:,0] + 1j*velocities[:,1],deg=False)
+        # Converts angle so that it is w.r.t the North 
+#        buoyangles = (np.pi/2-buoyangles)%(2*np.pi)
+        self.buoyangle = buoyangles
         self.velocity = velocities
         self.coordinates = coordinates
         self.speed = speed
@@ -147,7 +154,7 @@ class drifter_analysis(object):
         for k in range(len(self.velocity)):
             v0 = velocities_wind[k]
             v1 = self.velocity[k]
-            angle = -np.math.atan2(np.linalg.det([v0,v1]),np.dot(v0,v1))    
+            angle = -np.math.atan2(np.linalg.det([v0,v1]),np.dot(v0,v1))
             # Positive angle --> buoy movement to the right of the wind
             angles[k] = np.degrees(angle)
             
